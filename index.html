@@ -59,6 +59,7 @@
 		$.get("CWBIndex.csv", function (data) {
 	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
 	        areas = csvdata["data"]
+        	updateHeat(" OVERALL CWB_Index Score", true) //we don't need the geometry for this
 	        getAreaGeometries()
 	    });
 
@@ -67,21 +68,73 @@
     function getAreaGeometries() {
 
 	    areas.forEach(function(area) {
+
 	    	let url = "http://opendata.atlantaregional.com/datasets/daa63723158740898952c93dff03a8f5_118.geojson?where=ZIP='"+ area["Zipcodes"] + "'"
 			$.getJSON(url, function(json) {
-				console.log(json)
-				area["feature"] = json["features"][0]
-				area["layer"] = L.geoJSON(area["feature"]).addTo(map);
-				// area["layer"].setStyle = {
-				//     "fillColor": "#ff0000",
-				//     "weight": 5,
-				//     "fillOpacity": 1
-				// };
-
+				area["geojson"] = L.geoJSON(json["features"][0]).addTo(map);
+				drawHeatForArea(area)
 			});
+
 	    });
 
     }
+
+   	function updateHeat(indicator, higherBetter) {
+
+		//min = 50, max = 95
+		//max-min = 45
+		//given 50, heat should be around 0.9
+		//give 90, heat should be around 0.1
+
+    	var min=10000,max=-10000;
+    	areas.forEach(function(area) {
+    		if(area[indicator] < min) {
+    			min = area[indicator]
+    		}
+    		if(area[indicator] > max) {
+    			max = area[indicator]
+    		}
+    	});
+
+    	areas.forEach(function(area) {
+    		let normalizedIndicator = (area[indicator] - min)/(max - min) //between 0 and 1
+    		if(higherBetter == false) {
+	    		area["heat"] = normalizedIndicator
+	    	} else {
+	    		area["heat"] = 1 - normalizedIndicator
+	    	}
+    	});
+
+	}
+
+	function drawHeatForArea(area) {
+		
+		//heat is always normalized from 0-1
+		//we'd like a minimum opacity of 0.2 and maximum of 0.8, so lets squish that range a little
+		let opacity = 0.6 * area["heat"] + 0.2
+
+		area["geojson"].setStyle({
+		    "color": "#ff0000", //stroke color
+		    "fillColor": "#ff0000",
+		    "weight": 2,
+		    "fillOpacity": opacity
+		});
+	}
+
+	// bucketOpacity(opacity,min,max) {
+	// 	let numBuckets = 5
+
+	// 	//0.2,4,6,8
+	// 	if(opacity)
+	// }
+
+
+
+
+
+
+
+    
 
 
 
