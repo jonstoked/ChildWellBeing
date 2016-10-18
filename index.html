@@ -16,6 +16,7 @@
 	<!-- jon's dependencies -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script>document.write('<script src="http://' + (location.host || '${1:localhost}').split(':')[0] + ':${2:35729}/livereload.js?snipver=1"></' + 'script>')</script>
+	<script src="https://fastcdn.org/Papa-Parse/4.1.2/papaparse.min.js"></script>
 
    <style>
 	   html, body, #mapid {
@@ -32,36 +33,12 @@
 <div id="mapid"></div>
 <script>
 
-	var counties, map;
+	var map, areas;
 
-	$.getJSON("counties.json", function(json) {
-	    filterCounties(json["features"])
-	});
+	setupMap();
+	getAreas();
 
-	//takes array of counties
-	function filterCounties(allCounties) {
-
-		counties = allCounties.filter(function (county,n) {
-			var name = county["properties"]["NAME10"]
-	        return isCountyMetroAtlanta(name);
-    	});
-
-    	// console.log(countiesFiltered)
-    	displayCounties();
-	}
-
-	function isCountyMetroAtlanta(countyName) {
-		var isMetro = false
-		let metroAtlantaCounties = ["Lanier", "Cherokee", "Paulding", "Cobb", "Gwinnett", "DeKalb", "Coweta", "Henry", "Butts", "Fayette", "Douglas", "Rockdale", "Clayton", "Fulton"]
-		metroAtlantaCounties.forEach(function(metroAtlantaCounty){
-			if (metroAtlantaCounty == countyName) {
-				isMetro = true
-			}
-		});
-		return isMetro
-	}
-
-	function displayCounties() {
+	function setupMap() {
 
 		map = L.map('mapid', {
 	    	fullscreenControl: true
@@ -75,46 +52,58 @@
 			id: 'mapbox.streets'
 		}).addTo(map);
 
-
-		counties.forEach(function(county) {
-			// console.log(county["properties"]["NAME10"])
-			L.geoJSON(county).addTo(map);
-		})
-
-
-
-
-
-
-		// L.marker([51.5, -0.09]).addTo(map)
-		// 	.bindPopup("<b>Champions!</b><br />We will win.").openPopup();
-
-		// L.circle([51.508, -0.11], 500, {
-		// 	color: 'red',
-		// 	fillColor: '#f03',
-		// 	fillOpacity: 0.5
-		// }).addTo(map).bindPopup("I am a circle.");
-
-		// L.polygon([
-		// 	[51.509, -0.08],
-		// 	[51.503, -0.06],
-		// 	[51.51, -0.047]
-		// ]).addTo(map).bindPopup("I am a polygon.");
-
-
-		// var popup = L.popup();
-
-
-
-		map.on('click', onMapClick);
 	}
 
-	function onMapClick(e) {
-		popup
-			.setLatLng(e.latlng)
-			.setContent("You clicked the map at " + e.latlng.toString())
-			.openOn(map);
+	function getAreas() {
+
+		$.get("CWBIndex.csv", function (data) {
+	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
+	        areas = csvdata["data"]
+	        getAreaGeometries()
+	    });
+
 	}
+
+    function getAreaGeometries() {
+
+	    areas.forEach(function(area) {
+	    	let url = "http://opendata.atlantaregional.com/datasets/daa63723158740898952c93dff03a8f5_118.geojson?where=ZIP='"+ area["Zipcodes"] + "'"
+			$.getJSON(url, function(json) {
+				console.log(json)
+				area["feature"] = json["features"][0]
+				area["layer"] = L.geoJSON(area["feature"]).addTo(map);
+				// area["layer"].setStyle = {
+				//     "fillColor": "#ff0000",
+				//     "weight": 5,
+				//     "fillOpacity": 1
+				// };
+
+			});
+	    });
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+	//takes array of counties
+	// function filterCounties(allCounties) {
+
+	// 	counties = allCounties.filter(function (county,n) {
+	// 		var name = county["properties"]["NAME10"]
+	//         return isCountyMetroAtlanta(name);
+ //    	});
+
+ //    	// console.log(countiesFiltered)
+ //    	displayCounties();
+	// }
 
 
 </script>
