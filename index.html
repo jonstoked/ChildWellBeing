@@ -7,15 +7,12 @@
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
-	<!-- <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" /> -->
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
 	<script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
 
 	<!-- jon's dependencies -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script>document.write('<script src="http://' + (location.host || '${1:localhost}').split(':')[0] + ':${2:35729}/livereload.js?snipver=1"></' + 'script>')</script>
 	<script src="https://fastcdn.org/Papa-Parse/4.1.2/papaparse.min.js"></script>
 
    <style>
@@ -25,6 +22,24 @@
 	      padding:0px;
 	      margin:0px;
 	   } 
+	   .legend { 
+		   	text-align: left; 
+		   	line-height: 18px; 
+		   	color: #555; 
+	   	} 
+
+	   	/* color boxes for legend */
+	   	.legend i { 
+	   		width: 48px; 
+	   		height: 18px; 
+	   		float: left; 
+	   		opacity: 0.7; 
+	   	}
+
+	   	.legendCutoff {
+	   		margin-left: 26px; 
+	   	}
+
    </style>
 
 </head>
@@ -34,6 +49,8 @@
 <script>
 
 	var map, areas;
+	let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
+	var cutoffs = ["10","20","30","40"]
 
 	setupMap();
 	getAreas();
@@ -79,6 +96,8 @@
 					}
 				});
 			});
+
+			setupLegend()
 		});
     }
 
@@ -126,7 +145,6 @@
 
 	function colorForHeat(heat) {
 
-		let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 		let index = Math.ceil(heat*5)-1;
 		return colors[index];
 		//input 0-1
@@ -135,6 +153,44 @@
 		//0.2*5 = 1
 		//0.4*5 = 2
 		//1*5 = 5 
+	}
+
+	function setupLegend() {
+
+		var legend = L.control({position: 'bottomright'});
+
+		legend.onAdd = function (map) {
+
+			var div = L.DomUtil.create('div', 'info legend'),
+				grades = [0, 10, 20, 50, 100],
+				boxes = [],
+				labels = [],
+				from, to;
+
+			for (var i = 0; i < grades.length; i++) {
+				from = grades[i];
+				to = grades[i + 1];
+
+				boxes.push(
+					'<i style="background:' + colors[i] + '"></i>');
+					// from + (to ? '&ndash;' + to : '+'));
+
+					// '<i style="background:' + "#ffffb2" + '"></i> ' +
+					// from + (to ? '&ndash;' + to : '+'));
+			}
+
+			cutoffs.forEach(function(cutoff) {
+				labels.push('<span class="legendCutoff">' + cutoff + '</span>')
+			});
+
+			div.innerHTML = boxes.join("");
+			div.innerHTML += "<br>" + labels.join("");
+
+			return div;
+		};
+
+		legend.addTo(map);
+
 	}
 
 
