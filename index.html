@@ -49,7 +49,7 @@
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'mapbox.streets'
+			id: 'mapbox.light'
 		}).addTo(map);
 
 	}
@@ -113,31 +113,29 @@
 	function drawHeatForArea(area) {
 		
 		//heat is always normalized from 0-1
-		//we'd like a minimum opacity of 0.2 and maximum of 0.8, so lets squish that range a little
-		let opacity = 0.6 * area["heat"] + 0.2
+		let color = colorForHeat(area["heat"])
 
 		area["geojson"].setStyle({
-		    "color": "#ff0000", //stroke color
-		    "fillColor": "#ff0000",
 		    "weight": 2,
-		    "fillOpacity": opacity
+		    "color": color, //stroke
+		    "opacity": 0.6, //stroke
+		    "fillColor": color,
+		    "fillOpacity": 0.6 
 		});
 	}
 
-	// bucketOpacity(opacity,min,max) {
-	// 	let numBuckets = 5
+	function colorForHeat(heat) {
 
-	// 	//0.2,4,6,8
-	// 	if(opacity)
-	// }
+		let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
+		let index = Math.ceil(heat*5)-1;
+		return colors[index];
+		//input 0-1
+		//output 0-4
 
-
-
-
-
-
-
-    
+		//0.2*5 = 1
+		//0.4*5 = 2
+		//1*5 = 5 
+	}
 
 
 
@@ -146,20 +144,7 @@
 
 
 
-
-
-
-	//takes array of counties
-	// function filterCounties(allCounties) {
-
-	// 	counties = allCounties.filter(function (county,n) {
-	// 		var name = county["properties"]["NAME10"]
-	//         return isCountyMetroAtlanta(name);
- //    	});
-
- //    	// console.log(countiesFiltered)
- //    	displayCounties();
-	// }
+  
 
 
 </script>
