@@ -67,16 +67,19 @@
 
     function getAreaGeometries() {
 
-	    areas.forEach(function(area) {
+		$.getJSON("zipCodeGeometry.json", function(zipCodeGeometries) {
 
-	    	let url = "http://opendata.atlantaregional.com/datasets/daa63723158740898952c93dff03a8f5_118.geojson?where=ZIP='"+ area["Zipcodes"] + "'"
-			$.getJSON(url, function(json) {
-				area["geojson"] = L.geoJSON(json["features"][0]).addTo(map);
-				drawHeatForArea(area)
+			zipCodeGeometries.forEach(function(zipCodeGeometry) {
+
+			    areas.forEach(function(area) {
+
+					if(area["Zipcodes"] == zipCodeGeometry["properties"]["ZIP"]) {
+						area["geojson"] = L.geoJSON(zipCodeGeometry).addTo(map);
+						drawHeatForArea(area)
+					}
+				});
 			});
-
-	    });
-
+		});
     }
 
    	function updateHeat(indicator, higherBetter) {
