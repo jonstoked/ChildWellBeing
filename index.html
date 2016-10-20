@@ -144,6 +144,12 @@
 		}
 	}
 
+	function showDrawer() {
+		// if($('#drawerExample').hasClass('open')) {
+			$('#drawerExample').drawer('show');
+		// }
+	}
+
 	// function onEachFeature(feature, layer) {
 	// 	layer.on({
 	// 		// mouseover: highlightFeature,
@@ -315,6 +321,8 @@
 		  redrawHeat()
 		  hideDrawer()
 		})
+
+		showDrawer()
 
 	}
 
