@@ -1,0 +1,16 @@
+Indicator,higherBetter,type
+Child Well Being Index,TRUE,
+"High School, College & Career Readiness",TRUE,percent
+High School Graduation Rate,TRUE,percent
+Students Exceeding 3rd Grade Reading Level,TRUE,percent
+Students Exceeding 8th Grade Math Level,TRUE,percent
+Chilren Without Health Insurance,,percent
+Low Birth Weights,,percent
+Children in Poverty,,percent
+Families Not Financially Stable,,percent
+Families w/ Housing Cost Burden,,percent
+Births to Moms w/o High School Diploma,,percent
+Parents Enrolled in Post Secondary Education,TRUE,percent
+Adults w/o High School Diploma,,percent
+Adults w/o Health Insurance,,percent
+Unemployment Rate,,percent
