@@ -68,9 +68,9 @@
 </div>
 <script>
 
-	var map, areas, indicators, indicatorNames = [];
-	let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
-	var cutoffs = ["10","20","30","40"];
+	var map, areas, indicators, indicatorNames = [], cutoffs;
+	// let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
+	let colors = ["#0E5051", "#4FB6A1", "#E2DCB0", "#E69241", "#CF2E1D"]
 	var currentIndicator = "";
 
 	setupMap();
@@ -103,7 +103,7 @@
 		$.get("CWBIndex2.csv", function (data) {
 	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
 	        areas = csvdata["data"]
-	        setIndicator(indicatorNames[3])
+	        setIndicator(indicatorNames[2])
 	        getAreaGeometries()
 	    });
 
@@ -131,7 +131,7 @@
     	indicators.forEach(function(indicator) {
     		if(currentIndicator == indicator["Indicator"]) { //damn, poor naming dude, but its crunch time, this is a hackathon!
     			updateHeat(currentIndicator,indicator["higherBetter"])
-    			updateLegend()
+    			updateLegend(indicator["type"])
     		}
     	});
     }
@@ -212,7 +212,7 @@
 		//1*5 = 5 
 	}
 
-	function updateLegend() {
+	function updateLegend(type) {
 		$("#legendHeader").html("<b>" + currentIndicator + "</b>")
 
 		var boxes = $(".box")
@@ -221,7 +221,12 @@
 		})
 
 		$(".cutoff").each(function(i,cutoff) {
-			cutoff.innerHTML = Math.round( cutoffs[i] * 10) / 10
+			let value = Math.round( cutoffs[i] * 10) / 10;
+			if(type == "percent") {
+				cutoff.innerHTML = value + "%"
+			} else {
+				cutoff.innerHTML = value
+			}
 		})
 	}
 
