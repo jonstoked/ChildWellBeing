@@ -15,6 +15,18 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="https://fastcdn.org/Papa-Parse/4.1.2/papaparse.min.js"></script>
 
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<!-- Optional theme -->
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
+
+	<!-- Bootstrap Drawer -->
+	<link rel="stylesheet" type="text/css" href="bootstrap-drawer.min.css">
+
+
    <style>
 	   html, body, #mapid {
 	      height:100%;
@@ -58,14 +70,41 @@
 
 </head>
 
-<body>
-<div id="mapid">
-	<div id = "legend">
-		<div id = "legendHeader" style="text-align:center; height:26px; line-height: 22px;"><b> Child Well Being Index </b></div>
-		<div class = "box" style="margin-left:16px;"></div><div class = "box"></div><div class = "box"></div><div class = "box"></div><div class = "box"></div>
-		<div class = "cutoff" style="margin-left:42px;">10</div><div class = "cutoff">20</div><div class = "cutoff">30</div><div class = "cutoff">40</div>
+<body class="has-drawer"> <!-- add this class to your body for proper sizing -->
+
+    <div id="drawerExample" class="drawer dw-xs-10 dw-sm-6 dw-md-4 fold" aria-labelledby="drawerExample">
+        <div class="drawer-controls">
+            <a href="#drawerExample" data-toggle="drawer" aria-foldedopen="false" aria-controls="drawerExample" class="btn btn-primary btn-sm">Layers</a>
+        </div>
+        <div class="drawer-contents">
+            <div class="drawer-heading">
+                <h3 class="drawer-title">Choose Layer</h3>
+            </div>
+<!--             <div class="drawer-body">
+                <p>
+                    This is a properly padded container for content in the
+                    drawer that isn't a navigation.
+                </p>
+                <a href="#">A Regular Link</a>
+            </div> -->
+            <ul class="drawer-nav">
+                <li role="presentation" class="active"><a href="#">Home</a></li>
+                <li role="presentation"><a href="#">Profile</a></li>
+                <li role="presentation"><a href="#">Messages</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="mapid">
+		<div id = "legend">
+			<div id = "legendHeader" style="text-align:center; height:26px; line-height: 22px;"><b> Child Well Being Index </b></div>
+			<div class = "box" style="margin-left:16px;"></div><div class = "box"></div><div class = "box"></div><div class = "box"></div><div class = "box"></div>
+			<div class = "cutoff" style="margin-left:42px;">10</div><div class = "cutoff">20</div><div class = "cutoff">30</div><div class = "cutoff">40</div>
+		</div>
 	</div>
-</div>
+
+<script src="drawer.min.js"></script>
+
 <script>
 
 	var map, areas, indicators, indicatorNames = [], cutoffs;
@@ -98,6 +137,7 @@
 	        indicators.forEach(function(indicator) {
 	        	indicatorNames.push(indicator["Indicator"])
 	        });
+	        setupDrawer()
 	    });
 
 		$.get("CWBIndex2.csv", function (data) {
@@ -123,6 +163,12 @@
 					}
 				});
 			});
+		});
+    }
+
+    function redrawHeat() {
+	    areas.forEach(function(area) {
+			drawHeatForArea(area)
 		});
     }
 
@@ -230,14 +276,21 @@
 		})
 	}
 
+	function setupDrawer() {
 
+        var html = '<li role="presentation" class="active indicator"><a href="#">' + indicatorNames[0] + '</a></li>';
+        for (i=1; i<indicatorNames.length; ++i) {
+        	html += '<li role="presentation" class = "indicator"><a href="#">' + indicatorNames[i] + '</a></li>';	
+        }
 
+        $(".drawer-nav").html(html)
 
+    	$(".indicator").click(function() {
+		  setIndicator(event.target.text)
+		  redrawHeat()
+		})
 
-
-
-
-  
+	}
 
 
 </script>
