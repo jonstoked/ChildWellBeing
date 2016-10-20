@@ -98,46 +98,16 @@
 	        indicators.forEach(function(indicator) {
 	        	indicatorNames.push(indicator["Indicator"])
 	        });
-	   		console.log(indicatorNames)
 	    });
 
 		$.get("CWBIndex2.csv", function (data) {
 	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
 	        areas = csvdata["data"]
-	        currentIndicator = indicatorNames[10] //" OVERALL CWB_Index Score"
-        	updateHeat(currentIndicator, true) //we don't need the geometry for this
-        	updateLegend()
+	        setIndicator(indicatorNames[3])
 	        getAreaGeometries()
 	    });
 
-
-
-
-		// $.get("CWBIndex.csv", function (data) {
-	 //        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
-	 //        areas = csvdata["data"]
-	 //        currentIndicator = " OVERALL CWB_Index Score"
-  //       	updateHeat(currentIndicator, true) //we don't need the geometry for this
-  //       	updateLegend()
-	 //        getAreaGeometries()
-	 //    });
-
 	}
-
-	// function dictFromArrayKeyedBy(property, array) {
-	// 	var dict = []
-	// 	array.forEach(function(object) {
-	// 		for (var prop in object) {
-	// 			if (object.hasOwnProperty(prop)) {
-	// 				dict.push({
-	// 				    key:   "keyName",
-	// 				    value: "the value"
-	// 				});
-	// 			}
-	// 		}
-	// 	}
-	// 	return dict
-	// }
 
     function getAreaGeometries() {
 
@@ -153,9 +123,17 @@
 					}
 				});
 			});
-
-			setupLegend()
 		});
+    }
+
+    function setIndicator(indicatorName) {
+    	currentIndicator = indicatorName
+    	indicators.forEach(function(indicator) {
+    		if(currentIndicator == indicator["Indicator"]) { //damn, poor naming dude, but its crunch time, this is a hackathon!
+    			updateHeat(currentIndicator,indicator["higherBetter"])
+    			updateLegend()
+    		}
+    	});
     }
 
    	function updateHeat(indicator, higherBetter) {
@@ -175,14 +153,36 @@
     		}
     	});
 
+    	updateCutoffs(min,max,higherBetter);
+
     	areas.forEach(function(area) {
     		let normalizedIndicator = (area[indicator] - min)/(max - min) //between 0 and 1
-    		if(higherBetter == false) {
-	    		area["heat"] = normalizedIndicator
-	    	} else {
+    		if(higherBetter == true) {
 	    		area["heat"] = 1 - normalizedIndicator
+	    	} else {
+	    		area["heat"] = normalizedIndicator
 	    	}
     	});
+
+
+	}
+
+	function updateCutoffs(min,max,higherBetter) {
+		//40-90
+		//50/6 = 8.3 = increment
+
+		let range = max-min;
+		let numCutoffs = 6.0;
+		let increment = range/numCutoffs;
+
+		cutoffs = []
+		for (i=1; i<numCutoffs-1; ++i) {
+			cutoffs.push(min+i*increment)
+		}
+
+		if(higherBetter) {
+			cutoffs.reverse();
+		}
 
 	}
 
@@ -212,21 +212,17 @@
 		//1*5 = 5 
 	}
 
-	function setupLegend() {
+	function updateLegend() {
+		$("#legendHeader").html("<b>" + currentIndicator + "</b>")
 
 		var boxes = $(".box")
 		boxes.each(function(i,box) {
 			box.style.backgroundColor = colors[i]
 		})
 
-		// $(".cutoff").each(function(i,cutoff) {
-		// 	cutoff.style.backgroundColor = colors[i]
-		// })
-
-	}
-
-	function updateLegend() {
-		$("#legendHeader").html("<b>" + currentIndicator + "</b>")
+		$(".cutoff").each(function(i,cutoff) {
+			cutoff.innerHTML = Math.round( cutoffs[i] * 10) / 10
+		})
 	}
 
 
