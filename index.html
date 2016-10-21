@@ -140,6 +140,10 @@
 			id: 'mapbox.light'
 		}).addTo(map);
 
+		L.control.zoom({
+			position: 'topright'
+		}).addTo(map);
+
 	}
 
 	function hideDrawer() {
@@ -201,6 +205,8 @@
     function addGeometryToMapForArea(area, geometry) {    	
 		area["geojson"] = L.geoJSON(geometry, {
 			onEachFeature: function(feature, layer) {
+
+				//http://stackoverflow.com/questions/13316925/simple-label-on-a-leaflet-geojson-polygon
 				// var label = L.marker(layer.getBounds().getCenter(), {
 				// 	icon: L.divIcon({
 				// 		className: 'label',
