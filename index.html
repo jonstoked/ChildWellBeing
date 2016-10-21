@@ -26,11 +26,6 @@
 	<!-- Bootstrap Drawer -->
 	<link rel="stylesheet" type="text/css" href="bootstrap-drawer.min.css">
 
-	<!-- GeoCoding -->
-	<script src="src/js/l.control.geosearch.js"></script>
-	<script src="src/js/l.geosearch.provider.google.js"></script>
-	<link rel="stylesheet" href="src/css/l.geosearch.css" />
-
 
    <style>
 	   html, body, #mapid {
@@ -124,11 +119,11 @@
 	// let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 	let colors = ["#0E5051", "#4FB6A1", "#E2DCB0", "#E69241", "#CF2E1D"]
 	var currentIndicator = "";
-	var geocoder;
 
 	setupMap();
 	getAreas();
-	getAgencies();
+	getLatLon();
+	// getAgencies();
 
 	function setupMap() {
 
@@ -150,13 +145,6 @@
 		L.control.zoom({
 			position: 'topright'
 		}).addTo(map);
-
-		geocoder = new L.GeoSearch.Provider.Google();
-		geocoder.GetLocations('1813 S. Hwy. 42, 30216 Atlanta GA', function(data) {
-			// console.log(data)
-			latLng = new L.LatLng(data[0]['Y'], data[0]['X']);
-	        marker = new L.Marker (latLng).addTo(map);
-		});
 
 	}
 
@@ -345,9 +333,12 @@
 
 	function setupDrawer() {
 
-        var html = '<li role="presentation" class = "indicator"><a href="#">' + indicatorNames[0] + '</a></li>';
-        for (i=1; i<indicatorNames.length; ++i) {
-        	html += '<li role="presentation" class = "indicator"><a href="#">' + indicatorNames[i] + '</a></li>';	
+		// for (i=0; i<indicatorNames.length; ++i) {
+  //       	html += '<li role="presentation" class = "indicator">' + indicatorNames[i] + '</li>';	
+  //       }
+  		var html = "";
+        for (i=0; i<indicatorNames.length; ++i) {
+        	html += '<li role="presentation" class = "indicator">' + indicatorNames[i] + '</li>';	
         }
 
         $(".drawer-nav").html(html)
@@ -362,6 +353,18 @@
 
 	}
 
+	var latLons;
+	function getLatLon() {
+		$.get("LatLon.csv", function (data) {
+	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
+	        latLons = csvdata["data"]
+	        // entries.forEach(function(entry) {
+
+	        // });
+	        getAgencies();
+	    });
+	}
+
 	var entries;
 	function getAgencies() {
 
@@ -371,26 +374,45 @@
 	        entries = csvdata["data"]
 	        entries.forEach(function(entry) {
 
-	        	if(!agencyExists([entry["Agency"]])) {
-	        		var agency = {};
-	        		copyKeysFromEntryToAgency(entry,agency);
-	        		agency["FocusAreas"] = getFocusAreasForAgency(agency);
-	        		agencies.push(agency);
-	        	}
+	        	if(isZipCodeOfInterest(entry["ZipCode"])) {
+
+		        	if(!agencyExists([entry["Agency"]])) {
+
+		        		var agency = {};
+		        		copyKeysFromEntryToAgency(entry,agency);
+		        		agency["FocusAreas"] = getFocusAreasForAgency(agency);
+		        		agency["Services"] = getServices(agency);
+
+						latLons.forEach(function(latlon) {
+							let latLonAddress = latlon["Full Address"]
+							if (entry["Full Address"] == latLonAddress) {
+								agency["Lat"] = latlon["Lat"];
+								agency["Lon"] = latlon["Lon"];
+ 							}
+						});
+
+		        		agencies.push(agency);
+		        	}
+
+		        }
 
 	        })
 
-        	//populate zip code
-        	// agencies.forEach(function(agency) {
-        		
-        	// });
-
-	        
-	        getFocusAreasForAgency(agencies[1])
-	        console.log(agencies)
+	        //done
+	        console.log(agencies);
 
 	    });
 
+	}
+
+	function isZipCodeOfInterest(zipCode) {
+		let ofInterest = false;
+		areas.forEach(function(area) {
+			if(area["ZipCode"] == zipCode) {
+				ofInterest = true
+			}
+		});
+		return ofInterest;
 	}
 
 	function getFocusAreasForAgency(agencyToFind) {
@@ -402,7 +424,6 @@
 			if(entry["Agency"] == agencyToFind["Agency"]) {
 
 				focusAreas.push(entry["FocusArea"]);
-
 			}
 
 		});
@@ -410,18 +431,24 @@
 		return focusAreas.getUnique()
 	}
 
+	function getServices(agency) {
 
+		var services = []
 
-	// function focusAreaExistsForAgency(focusArea, agencyToFind) {
-	// 	agencies.forEach(function(agency) {
-	// 		agency["FocusAreas"].forEach(function (focusArea)  {
-	// 			agency.focusA
-	// 		});
-	// 	});
-	// }
+		entries.forEach(function(entry) {
+			
+			if(entry["Agency"] == agency["Agency"]) {
+
+				services.push(entry["Service"]);
+			}
+
+		});
+
+		return services
+	}
 
 	function copyKeysFromEntryToAgency(entry,agency) {
-		keys = ["Agency", "ZipCode", "County", "Address"];
+		keys = ["Agency", "ZipCode", "County", "Address", "City"];
 		keys.forEach(function(key) {
 			agency[key] = entry[key];
 		});
