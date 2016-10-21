@@ -120,7 +120,7 @@
 
 <script>
 
-	var map, areas, indicators, indicatorNames = [], cutoffs;
+	var map, areas, indicators, indicatorNames = [], cutoffs, agencies;
 	// let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 	let colors = ["#0E5051", "#4FB6A1", "#E2DCB0", "#E69241", "#CF2E1D"]
 	var currentIndicator = "";
@@ -128,6 +128,7 @@
 
 	setupMap();
 	getAreas();
+	getAgencies();
 
 	function setupMap() {
 
@@ -152,10 +153,9 @@
 
 		geocoder = new L.GeoSearch.Provider.Google();
 		geocoder.GetLocations('1813 S. Hwy. 42, 30216 Atlanta GA', function(data) {
-			console.log(data)
+			// console.log(data)
 			latLng = new L.LatLng(data[0]['Y'], data[0]['X']);
 	        marker = new L.Marker (latLng).addTo(map);
-			// in data are your results with x, y, label and bounds (currently availabel for google maps provider only)
 		});
 
 	}
@@ -360,6 +360,94 @@
 
 		showDrawer()
 
+	}
+
+	var entries;
+	function getAgencies() {
+
+		agencies = []
+		$.get("Agencies.csv", function (data) {
+	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
+	        entries = csvdata["data"]
+	        entries.forEach(function(entry) {
+
+	        	if(!agencyExists([entry["Agency"]])) {
+	        		var agency = {};
+	        		copyKeysFromEntryToAgency(entry,agency);
+	        		agency["FocusAreas"] = getFocusAreasForAgency(agency);
+	        		agencies.push(agency);
+	        	}
+
+	        })
+
+        	//populate zip code
+        	// agencies.forEach(function(agency) {
+        		
+        	// });
+
+	        
+	        getFocusAreasForAgency(agencies[1])
+	        console.log(agencies)
+
+	    });
+
+	}
+
+	function getFocusAreasForAgency(agencyToFind) {
+
+		var focusAreas = []
+
+		entries.forEach(function(entry) {
+			
+			if(entry["Agency"] == agencyToFind["Agency"]) {
+
+				focusAreas.push(entry["FocusArea"]);
+
+			}
+
+		});
+
+		return focusAreas.getUnique()
+	}
+
+
+
+	// function focusAreaExistsForAgency(focusArea, agencyToFind) {
+	// 	agencies.forEach(function(agency) {
+	// 		agency["FocusAreas"].forEach(function (focusArea)  {
+	// 			agency.focusA
+	// 		});
+	// 	});
+	// }
+
+	function copyKeysFromEntryToAgency(entry,agency) {
+		keys = ["Agency", "ZipCode", "County", "Address"];
+		keys.forEach(function(key) {
+			agency[key] = entry[key];
+		});
+	}
+
+	function agencyExists(agencyToFind) {
+		var exists = false
+		agencies.forEach(function(agency) {
+			if (agency["Agency"] == agencyToFind) {
+				exists = true;
+			} 
+		});
+		return exists;
+	}
+
+	Array.prototype.getUnique = function() {
+		var u = {},
+			a = [];
+		for (var i = 0, l = this.length; i < l; ++i) {
+			if (u.hasOwnProperty(this[i])) {
+				continue;
+			}
+			a.push(this[i]);
+			u[this[i]] = 1;
+		}
+		return a;
 	}
 
 
