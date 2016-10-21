@@ -26,6 +26,11 @@
 	<!-- Bootstrap Drawer -->
 	<link rel="stylesheet" type="text/css" href="bootstrap-drawer.min.css">
 
+	<!-- GeoCoding -->
+	<script src="src/js/l.control.geosearch.js"></script>
+	<script src="src/js/l.geosearch.provider.google.js"></script>
+	<link rel="stylesheet" href="src/css/l.geosearch.css" />
+
 
    <style>
 	   html, body, #mapid {
@@ -119,6 +124,7 @@
 	// let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 	let colors = ["#0E5051", "#4FB6A1", "#E2DCB0", "#E69241", "#CF2E1D"]
 	var currentIndicator = "";
+	var geocoder;
 
 	setupMap();
 	getAreas();
@@ -143,6 +149,14 @@
 		L.control.zoom({
 			position: 'topright'
 		}).addTo(map);
+
+		geocoder = new L.GeoSearch.Provider.Google();
+		geocoder.GetLocations('1813 S. Hwy. 42, 30216 Atlanta GA', function(data) {
+			console.log(data)
+			latLng = new L.LatLng(data[0]['Y'], data[0]['X']);
+	        marker = new L.Marker (latLng).addTo(map);
+			// in data are your results with x, y, label and bounds (currently availabel for google maps provider only)
+		});
 
 	}
 
