@@ -122,8 +122,8 @@
 
 	setupMap();
 	getAreas();
-	getLatLon();
-	// getAgencies();
+	// getLatLon();
+	getAgencies();
 
 	function setupMap() {
 
@@ -353,6 +353,54 @@
 
 	}
 
+	function getAgencies() {
+
+		$.getJSON("Agencies.json", function(agenciesJson) {
+			agencies = agenciesJson;
+			console.log(agencies);
+		});
+	}
+
+	// var entries;
+	// function getAgencies() {
+
+	// 	agencies = []
+	// 	$.get("Agencies.csv", function (data) {
+	//         var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
+	//         entries = csvdata["data"]
+	//         entries.forEach(function(entry) {
+
+	//         	if(isZipCodeOfInterest(entry["ZipCode"])) {
+
+	// 	        	if(!agencyExists([entry["Agency"]])) {
+
+	// 	        		var agency = {};
+	// 	        		copyKeysFromEntryToAgency(entry,agency);
+	// 	        		agency["FocusAreas"] = getFocusAreasForAgency(agency);
+	// 	        		agency["Services"] = getServices(agency);
+
+	// 					latLons.forEach(function(latlon) {
+	// 						let latLonAddress = latlon["Full Address"]
+	// 						if (entry["Full Address"] == latLonAddress) {
+	// 							agency["Lat"] = latlon["Lat"];
+	// 							agency["Lon"] = latlon["Lon"];
+ // 							}
+	// 					});
+
+	// 	        		agencies.push(agency);
+	// 	        	}
+
+	// 	        }
+
+	//         })
+
+	//         //done
+	//         console.log(agencies);
+
+	//     });
+
+	// }
+
 	var latLons;
 	function getLatLon() {
 		$.get("LatLon.csv", function (data) {
@@ -363,46 +411,6 @@
 	        // });
 	        getAgencies();
 	    });
-	}
-
-	var entries;
-	function getAgencies() {
-
-		agencies = []
-		$.get("Agencies.csv", function (data) {
-	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
-	        entries = csvdata["data"]
-	        entries.forEach(function(entry) {
-
-	        	if(isZipCodeOfInterest(entry["ZipCode"])) {
-
-		        	if(!agencyExists([entry["Agency"]])) {
-
-		        		var agency = {};
-		        		copyKeysFromEntryToAgency(entry,agency);
-		        		agency["FocusAreas"] = getFocusAreasForAgency(agency);
-		        		agency["Services"] = getServices(agency);
-
-						latLons.forEach(function(latlon) {
-							let latLonAddress = latlon["Full Address"]
-							if (entry["Full Address"] == latLonAddress) {
-								agency["Lat"] = latlon["Lat"];
-								agency["Lon"] = latlon["Lon"];
- 							}
-						});
-
-		        		agencies.push(agency);
-		        	}
-
-		        }
-
-	        })
-
-	        //done
-	        console.log(agencies);
-
-	    });
-
 	}
 
 	function isZipCodeOfInterest(zipCode) {
