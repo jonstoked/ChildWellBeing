@@ -70,6 +70,10 @@
 	   		z-index: 1000000000;
 	   	}
 
+	   	.zipLabel {
+	   		color: gray;
+	   	}
+
    </style>
 
 </head>
@@ -187,14 +191,26 @@
 			    areas.forEach(function(area) {
 
 					if(area["ZipCode"] == zipCodeGeometry["properties"]["ZIP"]) {
-						area["geojson"] = L.geoJSON(zipCodeGeometry, {
-							// onEachFeature: onEachFeature
-						}).addTo(map);
-						drawHeatForArea(area)
+						addGeometryToMapForArea(area, zipCodeGeometry);
 					}
 				});
 			});
 		});
+    }
+
+    function addGeometryToMapForArea(area, geometry) {    	
+		area["geojson"] = L.geoJSON(geometry, {
+			onEachFeature: function(feature, layer) {
+				// var label = L.marker(layer.getBounds().getCenter(), {
+				// 	icon: L.divIcon({
+				// 		className: 'label',
+				// 		html: '<div class=zipLabel>' + area["ZipCode"] + '</div>',
+				// 		iconSize: [100, 40]
+				// 	})
+				// }).addTo(map);
+			}
+		}).addTo(map);
+		drawHeatForArea(area)
     }
 
     function redrawHeat() {
