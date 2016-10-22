@@ -113,12 +113,14 @@
 
 <script src="drawer.min.js"></script>
 
-<script>
+<script>	
 
 	var map, areas, indicators, indicatorNames = [], cutoffs, agencies;
 	// let colors = ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"];
 	let colors = ["#0E5051", "#4FB6A1", "#E2DCB0", "#E69241", "#CF2E1D"]
 	var currentIndicator = "";
+	var focusAreas = ["Health", "Basic Needs", "Income", "Education", "Homelessness", "Miscellaneous"];
+	var activeFocusAreas = [];
 
 	setupMap();
 	getAreas();
@@ -338,7 +340,7 @@
   //       }
   		var html = "";
         for (i=0; i<indicatorNames.length; ++i) {
-        	html += '<li role="presentation" class = "indicator">' + indicatorNames[i] + '</li>';	
+        	html += '<li role="presentation" class = "indicator"><a href="#">' + indicatorNames[i] + '</a></li>';	
         }
 
         $(".drawer-nav").html(html)
@@ -357,9 +359,55 @@
 
 		$.getJSON("Agencies.json", function(agenciesJson) {
 			agencies = agenciesJson;
-			console.log(agencies);
+			activateFocusArea(focusAreas[0]);
 		});
 	}
+
+	function activateFocusArea(focusArea) {
+		var agenciesToActivate = getAgenciesForFocusArea(focusArea);
+		showAgencies(agenciesToActivate);
+	}
+
+	function getAgenciesForFocusArea(focusArea) {
+		var agenciesToReturn = [];
+		agencies.forEach(function(agency) {
+			agency["FocusAreas"].forEach(function(FA) {
+				if(FA == focusArea) {
+					agenciesToReturn.push(agency);
+				}
+			});
+		});
+		return agenciesToReturn;
+	}
+
+	function showAgencies(agenciesToShow) {
+		for(i=0; i<agenciesToShow.length; ++i) {
+			let agency = agenciesToShow[i];
+			let lat = agency["Lat"];
+			let lon = agency["Lon"];
+			let popup = L.popup().setLatLng([lat,lon]).setContent(agency["Agency"])
+			L.marker([lat, lon]).addTo(map).on('click', function onClick(e) {
+				popup.openOn(map);
+			});
+		}
+
+
+		// agenciesToShow.forEach(function(agency) {
+		// 	L.marker(agency["Lat"], agency["Lon"]).addTo(map);
+		// });
+
+	}
+
+
+
+
+
+
+
+
+
+
+
 
 	// var entries;
 	// function getAgencies() {
@@ -425,18 +473,18 @@
 
 	function getFocusAreasForAgency(agencyToFind) {
 
-		var focusAreas = []
+		var myfocusAreas = []
 
 		entries.forEach(function(entry) {
 			
 			if(entry["Agency"] == agencyToFind["Agency"]) {
 
-				focusAreas.push(entry["FocusArea"]);
+				myfocusAreas.push(entry["FocusArea"]);
 			}
 
 		});
 
-		return focusAreas.getUnique()
+		return myfocusAreas.getUnique()
 	}
 
 	function getServices(agency) {
