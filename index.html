@@ -171,6 +171,10 @@
 			position: 'topright'
 		}).addTo(map);
 
+		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			$('.btn-warning').css('margin-top',50+'px')
+		}
+
 	}
 
 	function hideDrawer() {
