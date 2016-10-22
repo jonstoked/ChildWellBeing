@@ -361,6 +361,7 @@
 			agencies = agenciesJson;
 			activateFocusArea(focusAreas[0]);
 		});
+
 	}
 
 	function activateFocusArea(focusArea) {
@@ -385,7 +386,7 @@
 			let agency = agenciesToShow[i];
 			let lat = agency["Lat"];
 			let lon = agency["Lon"];
-			let popup = L.popup().setLatLng([lat,lon]).setContent(agency["Agency"])
+			let popup = popupForAgency(agency,lat,lon);
 			L.marker([lat, lon]).addTo(map).on('click', function onClick(e) {
 				popup.openOn(map);
 			});
@@ -396,6 +397,12 @@
 		// 	L.marker(agency["Lat"], agency["Lon"]).addTo(map);
 		// });
 
+	}
+
+	function popupForAgency(agency,lat,lon) {
+
+		var popup = L.popup().setLatLng([lat,lon]).setContent(agency["Agency"])
+		return popup;
 	}
 
 
