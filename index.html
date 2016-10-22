@@ -3,7 +3,7 @@
 <html>
 <head>
 	
-	<title>Quick Start - Leaflet</title>
+	<title>ATL Child Well-Being Explorer</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -335,15 +335,21 @@
 
 	function setupDrawer() {
 
-		// for (i=0; i<indicatorNames.length; ++i) {
-  //       	html += '<li role="presentation" class = "indicator">' + indicatorNames[i] + '</li>';	
-  //       }
-  		var html = "";
+  		var html = "<h4>Focus Areas</h4>";
+		for (i=0; i<focusAreas.length; ++i) {
+        	html += '<li role="presentation" class = "focusArea"><a href="#">' + focusAreas[i] + '</a></li>';	
+        }
+
+   		html += "<h4>Child Well Being Index</h4>"
         for (i=0; i<indicatorNames.length; ++i) {
         	html += '<li role="presentation" class = "indicator"><a href="#">' + indicatorNames[i] + '</a></li>';	
         }
 
         $(".drawer-nav").html(html)
+
+        $(".focusArea").click(function() {
+        	toggleFocusArea(event.target.text);
+        })
 
     	$(".indicator").click(function() {
 		  setIndicator(event.target.text)
@@ -359,14 +365,51 @@
 
 		$.getJSON("Agencies.json", function(agenciesJson) {
 			agencies = agenciesJson;
-			activateFocusArea(focusAreas[0]);
+			agencies.forEach(function(agency) {
+				agency["Marker"] = null; 
+			})
+			showFocusArea(focusAreas[0]);
 		});
 
 	}
 
-	function activateFocusArea(focusArea) {
-		var agenciesToActivate = getAgenciesForFocusArea(focusArea);
-		showAgencies(agenciesToActivate);
+	function toggleFocusArea(focusArea) {
+		if(focusAreaIsShowing(focusArea)) {
+			hideFocusArea(focusArea);
+		} else {
+			showFocusArea(focusArea);
+		}
+
+	}
+
+	function focusAreaIsShowing(focusArea) {
+		var isShowing = false;
+		activeFocusAreas.forEach(function(activeFA) {
+			if(focusArea == activeFA) {
+				isShowing = true
+			}
+		})
+		return isShowing;
+	}
+
+
+
+	function showFocusArea(focusArea) {
+		activeFocusAreas.push(focusArea);
+		console.log(activeFocusAreas)
+		var agenciesToShow = getAgenciesForFocusArea(focusArea);
+		showAgencies(agenciesToShow);
+	}
+
+	function hideFocusArea(focusArea) {
+
+		let index = activeFocusAreas.indexOf(focusArea)
+		if (index > -1) {
+			activeFocusAreas.splice(index, 1);
+		}
+		console.log(activeFocusAreas)
+		var agenciesToHide = getAgenciesForFocusArea(focusArea);
+		hideAgencies(agenciesToHide);
 	}
 
 	function getAgenciesForFocusArea(focusArea) {
@@ -384,24 +427,34 @@
 	function showAgencies(agenciesToShow) {
 		for(i=0; i<agenciesToShow.length; ++i) {
 			let agency = agenciesToShow[i];
-			let lat = agency["Lat"];
-			let lon = agency["Lon"];
-			let popup = popupForAgency(agency,lat,lon);
-			L.marker([lat, lon]).addTo(map).on('click', function onClick(e) {
-				popup.openOn(map);
-			});
+
+			if(!agency["Marker"]) {
+				let lat = agency["Lat"];
+				let lon = agency["Lon"];
+				let popup = popupForAgency(agency,lat,lon);
+				agency["Marker"] = L.marker([lat, lon]).addTo(map).on('click', function onClick(e) {
+					popup.openOn(map);
+				});
+			}
 		}
+	}
 
-
-		// agenciesToShow.forEach(function(agency) {
-		// 	L.marker(agency["Lat"], agency["Lon"]).addTo(map);
-		// });
-
+	function hideAgencies(agenciesToHide) {
+		for(i=0; i<agenciesToHide.length; ++i) {
+			let agency = agenciesToHide[i];
+			if(agency["Marker"]) {
+				map.removeLayer(agency["Marker"]);
+				agency["Marker"] = null;
+			}
+		}
 	}
 
 	function popupForAgency(agency,lat,lon) {
-
-		var popup = L.popup().setLatLng([lat,lon]).setContent(agency["Agency"])
+		var html ="<b>" + agency["Agency"] + "</b><br>";
+		agency["FocusAreas"].forEach(function(FA) {
+			html += FA + "<br>"
+		})
+		var popup = L.popup().setLatLng([lat,lon]).setContent(html)
 		return popup;
 	}
 
@@ -461,9 +514,6 @@
 		$.get("LatLon.csv", function (data) {
 	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
 	        latLons = csvdata["data"]
-	        // entries.forEach(function(entry) {
-
-	        // });
 	        getAgencies();
 	    });
 	}
@@ -539,6 +589,23 @@
 		}
 		return a;
 	}
+
+	//http://stackoverflow.com/questions/5767325/how-to-remove-a-particular-element-from-an-array-in-javascript
+	Array.prototype.indexOf || (Array.prototype.indexOf = function(d, e) {
+		var a;
+		if (null == this) throw new TypeError('"this" is null or not defined');
+		var c = Object(this),
+			b = c.length >>> 0;
+		if (0 === b) return -1;
+		a = +e || 0;
+		Infinity === Math.abs(a) && (a = 0);
+		if (a >= b) return -1;
+		for (a = Math.max(0 <= a ? a : b - Math.abs(a), 0); a < b;) {
+			if (a in c && c[a] === d) return a;
+			a++
+		}
+		return -1
+	});
 
 
 </script>
