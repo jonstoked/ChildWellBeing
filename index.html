@@ -26,13 +26,28 @@
 	<!-- Bootstrap Drawer -->
 	<link rel="stylesheet" type="text/css" href="bootstrap-drawer.min.css">
 
+	<link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto:400,700" rel="stylesheet">
+
+
 
    <style>
-	   html, body, #mapid {
+
+		@font-face { font-family: "Aleo"; src: url('fonts/aleo/aleo-regular-webfont.otf'); } 
+		@font-face { font-family: "Aleo"; font-weight: bold; src: url('fonts/aleo/aleo-bold-webfont.otf');}
+
+	   html, body {
 	      height:100%;
 	      width:100%;
 	      padding:0px;
 	      margin:0px;
+	   } 
+
+	   #mapid {
+	      height:92%;
+	      width:100%;
+	      padding:0px;
+	      margin:0px;
+	      /*bottom:0px;*/
 	   } 
 
 	   	#legend {
@@ -74,6 +89,28 @@
 	   		color: gray;
 	   	}
 
+	   	.header {
+	   		display:table;
+	   		background: linear-gradient(#10167f , #06093e);
+	   		background-color: #10167f;
+	   		box-shadow: 2px 2px 2px rgba(0,0,0,0.4);;
+	   		height: 50px;
+	   		width:100%;
+	   	}
+
+	   	.headerTitle {
+	   		display: table-cell;
+	   		color:white;
+	   		/*background-color:red;*/
+	   		text-align:center;
+	   		width:100%;
+	   		height:100%;
+	   		vertical-align: middle;
+	   		font-size:150%;
+		    font-family: 'Roboto', sans-serif;
+		    /*font-weight:700;*/
+	   	}
+	
    </style>
 
 </head>
@@ -103,6 +140,9 @@
         </div>
     </div>
 
+    <div class="header">
+    	<div class="headerTitle"> United Way <i> Perspective </i></div>
+    </div>
     <div id="mapid">
 		<div id = "legend">
 			<div id = "legendHeader" style="text-align:center; height:26px; line-height: 22px;"><b> Child Well Being Index </b></div>
@@ -184,7 +224,7 @@
 		$.get("CWBIndex2.csv", function (data) {
 	        var csvdata = Papa.parse(data, {header:true,dynamicTyping:true});
 	        areas = csvdata["data"]
-	        setIndicator(indicatorNames[2])
+	        setIndicator(indicatorNames[0])
 	        getAreaGeometries()
 	    });
 
@@ -420,7 +460,7 @@
 		activeFocusAreas.push(focusArea);
 		// showCheckMark(focusArea);
 		var agenciesToShow = getAgenciesForFocusArea(focusArea);
-		showAgencies(agenciesToShow);
+		showAgencies(agenciesToShow, focusArea);
 	}
 
 	function hideFocusArea(focusArea) {
@@ -446,7 +486,22 @@
 		return agenciesToReturn;
 	}
 
-	function showAgencies(agenciesToShow) {
+	function iconForFocusArea(focusArea) {
+		// let icons = [""]
+		let index = focusAreas.indexOf(focusArea)
+		var icon = L.icon({
+			iconUrl: 'markers/' + index + '.png',
+			// shadowUrl: 'leaf-shadow.png',
+			iconSize: [26*0.7, 29*0.7], // size of the icon
+			// shadowSize: [50, 64], // size of the shadow
+			// iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+			// shadowAnchor: [4, 62], // the same for the shadow
+			// popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+		});
+		return icon;
+	}
+
+	function showAgencies(agenciesToShow, focusArea) {
 		for(i=0; i<agenciesToShow.length; ++i) {
 			let agency = agenciesToShow[i];
 
@@ -454,7 +509,9 @@
 				let lat = agency["Lat"];
 				let lon = agency["Lon"];
 				let popup = popupForAgency(agency,lat,lon);
-				agency["Marker"] = L.marker([lat, lon]).addTo(map).on('click', function onClick(e) {
+				agency["Marker"] = L.marker([lat, lon], {
+					icon: iconForFocusArea(focusArea)
+				}).addTo(map).on('click', function onClick(e) {
 					popup.openOn(map);
 				});
 			}
