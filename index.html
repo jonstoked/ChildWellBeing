@@ -514,11 +514,25 @@
 	}
 
 	function popupForAgency(agency,lat,lon) {
-		var html ="<b>" + agency["Agency"] + "</b><br>";
+		var html ='<div style="font-size:120%;"><b>' + agency["Agency"] + "</b></div>";
+
+		html+=agency["Address"] + "<br>" + agency["City"] + ", GA " + agency["ZipCode"] + "<br><br>"
+
+		html += "<b>Services</b><br>";
+		agency["Services"].forEach(function(service) {
+			html += service + "<br>"
+		})
+
+		html += "<br><b>Focus Areas</b><br>";
 		agency["FocusAreas"].forEach(function(FA) {
 			html += FA + "<br>"
 		})
-		var popup = L.popup().setLatLng([lat,lon]).setContent(html)
+
+		
+		var popup = L.popup({
+			maxHeight:300,
+			maxWidth:300
+		}).setLatLng([lat,lon]).setContent(html)
 		return popup;
 	}
 
