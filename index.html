@@ -237,6 +237,15 @@
 		area["geojson"] = L.geoJSON(geometry, {
 			onEachFeature: function(feature, layer) {
 
+				// feature.bindTooltip("pooop").openTooltip();
+
+				// var tt = L.tooltip({
+				// 	sticky:true
+				// }, feature).addTo(map)
+
+				// tt.setText("poops")
+
+
 				//http://stackoverflow.com/questions/13316925/simple-label-on-a-leaflet-geojson-polygon
 				// var label = L.marker(layer.getBounds().getCenter(), {
 				// 	icon: L.divIcon({
@@ -476,12 +485,7 @@
 		let index = focusAreas.indexOf(focusArea)
 		var icon = L.icon({
 			iconUrl: 'markers/' + index + '.png',
-			// shadowUrl: 'leaf-shadow.png',
-			iconSize: [26*0.7, 29*0.7], // size of the icon
-			// shadowSize: [50, 64], // size of the shadow
-			// iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
-			// shadowAnchor: [4, 62], // the same for the shadow
-			// popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+			iconSize: [26*0.7, 29*0.7], 
 		});
 		return icon;
 	}
@@ -530,8 +534,8 @@
 
 		
 		var popup = L.popup({
-			maxHeight:300,
-			maxWidth:300
+			maxHeight:220,
+			maxWidth:220
 		}).setLatLng([lat,lon]).setContent(html)
 		return popup;
 	}
