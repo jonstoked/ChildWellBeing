@@ -74,6 +74,12 @@
 	   		color: gray;
 	   	}
 
+	   	.checkmark {
+	   		/*background-color: pink;*/
+	   		/*right: 0px;*/
+	   		/*text-align: right;*/
+	   	}
+
    </style>
 
 </head>
@@ -337,7 +343,8 @@
 
   		var html = "<h4>Focus Areas</h4>";
 		for (i=0; i<focusAreas.length; ++i) {
-        	html += '<li role="presentation" class = "focusArea"><a href="#">' + focusAreas[i] + '</a></li>';	
+			html += '<li role="presentation" class = "focusArea"><a href="#">' + focusAreas[i] + '</a></li>';	
+        	// html += '<li role="presentation" class = "focusArea"><a href="#">' + focusAreas[i] + '<span class="glyphicon glyphicon-ok checkmark pull-right"></span></a></li>';	
         }
 
    		html += "<h4>Child Well Being Index</h4>"
@@ -349,16 +356,27 @@
 
         $(".focusArea").click(function() {
         	toggleFocusArea(event.target.text);
+        	updateCheckMarks();
         })
 
     	$(".indicator").click(function() {
 		  setIndicator(event.target.text)
 		  redrawHeat()
-		  hideDrawer()
+		  // hideDrawer()
 		})
 
 		showDrawer()
+	}
 
+	function updateCheckMarks() {
+		$('.focusArea').each(function(i,obj) {
+			let focusArea =  $(obj).text()
+			if(focusAreaIsShowing(focusArea)) {
+				$(obj).html('<li role="presentation" class = "focusArea"><a href="#">' + focusArea + '<span class="glyphicon glyphicon-ok checkmark pull-right"></span></a></li>')
+			} else {
+				$(obj).html('<li role="presentation" class = "focusArea"><a href="#">' + focusArea + '</a></li>')
+			}
+		})
 	}
 
 	function getAgencies() {
@@ -369,6 +387,8 @@
 				agency["Marker"] = null; 
 			})
 			showFocusArea(focusAreas[0]);
+        	updateCheckMarks();
+
 		});
 
 	}
@@ -392,11 +412,20 @@
 		return isShowing;
 	}
 
+	//this is broken --> it also modifies the child well being sections
+	// function showCheckMark(focusArea) {
+	// 	html = '<a href="#">' + focusArea + '<span class="glyphicon glyphicon-ok checkmark pull-right"></span></a>'
+	// 	console.log($( "li:contains('" + focusArea + "')").html(html));
+	// }
 
+	// function hideCheckMark(focusArea) {
+	// 	html = '<a href="#">' + focusArea + '</a>'
+	// 	console.log($( "li:contains('" + focusArea + "')").html(html));
+	// }
 
 	function showFocusArea(focusArea) {
 		activeFocusAreas.push(focusArea);
-		console.log(activeFocusAreas)
+		// showCheckMark(focusArea);
 		var agenciesToShow = getAgenciesForFocusArea(focusArea);
 		showAgencies(agenciesToShow);
 	}
@@ -407,7 +436,7 @@
 		if (index > -1) {
 			activeFocusAreas.splice(index, 1);
 		}
-		console.log(activeFocusAreas)
+		// hideCheckMark(focusArea)
 		var agenciesToHide = getAgenciesForFocusArea(focusArea);
 		hideAgencies(agenciesToHide);
 	}
@@ -503,7 +532,6 @@
 	//         })
 
 	//         //done
-	//         console.log(agencies);
 
 	//     });
 
