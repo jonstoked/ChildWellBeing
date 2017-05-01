@@ -1,0 +1,34 @@
+
+<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="11.8284107 18.6666667 4.52821706 22.5122115 5.92242998 14.3672169 0.0164492727 8.59889963 8.17831387 7.41056092 11.8284107 0 15.4785075 7.41056092 23.6403721 8.59889963 17.7343914 14.3672169 19.1286043 22.5122115"></polygon>
+        <filter x="-6.8%" y="-4.4%" width="113.6%" height="119.4%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+        <path d="M4.74262573,21.2596356 L18.1960376,7.80622373 L23.6403721,8.59889963 L17.7343914,14.3672169 L19.1286043,22.5122115 L11.8284107,18.6666667 L4.52821706,22.5122115 L4.74262573,21.2596356 Z" id="path-3"></path>
+    </defs>
+    <g id="Radar" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Activity-Copy-3" transform="translate(-1099.000000, -145.000000)">
+            <g id="Group-6" transform="translate(1101.000000, 147.000000)">
+                <g id="Top-Contributor">
+                    <g id="Group-2">
+                        <ellipse id="Oval" stroke="#33BEDE" stroke-width="2.4" fill="#356AA8" cx="15.9683544" cy="16" rx="15.9683544" ry="16"></ellipse>
+                        <g id="Group-Copy-6" transform="translate(4.731364, 3.555556)">
+                            <g id="Star-Copy-5">
+                                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                                <use fill="#EBC22F" fill-rule="evenodd" xlink:href="#path-1"></use>
+                            </g>
+                            <mask id="mask-4" fill="white">
+                                <use xlink:href="#path-3"></use>
+                            </mask>
+                            <use id="Combined-Shape" fill="#000000" opacity="0.100000001" xlink:href="#path-3"></use>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
